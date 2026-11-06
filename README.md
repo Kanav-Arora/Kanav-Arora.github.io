@@ -23,7 +23,7 @@ The filename becomes the post URL, for example `my-article.md` becomes `/posts/m
 
 ## Personalize the About page
 
-The About page is at `src/pages/about.astro`. It uses `public/profile.jpg` from the existing GitHub Pages repository; replace that file with another image to update the portrait.
+The About page is at `src/pages/about.astro`. It uses `public/profile.jpeg` for the portrait. The site favicon is `public/favicon.png`.
 
 ## Local development
 
