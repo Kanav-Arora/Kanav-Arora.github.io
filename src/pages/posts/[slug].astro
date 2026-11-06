@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
+export async function getStaticPaths() {
+	const posts = await getCollection('blog', ({ data }) => !data.draft);
+	return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const readTime = Math.max(1, Math.ceil(post.body.split(/\s+/).filter(Boolean).length / 220));
+const dateFormat = new Intl.DateTimeFormat('en', { month: 'long', day: 'numeric', year: 'numeric' });
+---
+
+<SiteLayout title={`${post.data.title} — Kanav Arora`} description={post.data.description}>
+	<main class="article-shell">
+		<a class="back-link" href={`${base}#writing`}><span aria-hidden="true">←</span> All writing</a>
+		<header class="article-header">
+			<div class="post-meta">
+				<time datetime={post.data.pubDate.toISOString()}>{dateFormat.format(post.data.pubDate)}</time>
+				<span class="meta-separator" aria-hidden="true">·</span>
+				<span>{readTime} min read</span>
+			</div>
+			<h1>{post.data.title}</h1>
+			<p class="article-deck">{post.data.description}</p>
+			<div class="tag-list article-tags">
+				{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+			</div>
+		</header>
+
+		{headings.length > 1 && (
+			<aside class="article-toc" aria-label="On this page">
+				<p class="eyebrow">On this page</p>
+				<nav>
+					{headings.filter((heading) => heading.depth === 2).map((heading) => (
+						<a href={`#${heading.slug}`}>{heading.text}</a>
+					))}
+				</nav>
+			</aside>
+		)}
+
+		<article class="prose">
+			<Content />
+		</article>
+
+		<div class="article-endnote">
+			<span class="endnote-mark">K.</span>
+			<p>Thanks for reading. Find me on <a href="https://www.linkedin.com/in/kanavarora1505/" target="_blank" rel="noreferrer">LinkedIn</a> or <a href="https://github.com/Kanav-Arora" target="_blank" rel="noreferrer">GitHub</a>.</p>
+		</div>
+		<a class="back-link article-back-link" href={`${base}#writing`}><span aria-hidden="true">←</span> Back to all writing</a>
+	</main>
+</SiteLayout>

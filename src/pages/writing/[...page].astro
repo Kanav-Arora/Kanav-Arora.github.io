@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
+export async function getStaticPaths({ paginate }) {
+	const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+	);
+	return paginate(posts, { pageSize: 8 });
+}
+
+const { page } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const dateFormat = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' });
+const readTime = (body: string) => Math.max(1, Math.ceil(body.split(/\s+/).filter(Boolean).length / 220));
+---
+
+<SiteLayout
+	title={`All writing — Page ${page.currentPage} — Kanav Arora`}
+	description="Browse all technical articles on software, systems, and technology."
+>
+	<main class="archive-shell">
+		<a class="back-link" href={`${base}`}><span aria-hidden="true">←</span> Home</a>
+		<header class="archive-header">
+			<p class="eyebrow">The complete archive</p>
+			<h1>All writing<span class="title-period">.</span></h1>
+			<p>Technical explorations, practical ideas, and the details behind the tools and systems we use.</p>
+			<span class="archive-total">{page.total} {page.total === 1 ? 'article' : 'articles'}</span>
+		</header>
+
+		{page.data.length > 0 ? (
+			<div class="post-list archive-post-list">
+				{page.data.map((post) => (
+					<article class="post-card">
+						<a class="post-card-link" href={`${base}posts/${post.id}/`} aria-label={`Read ${post.data.title}`}>
+							<div class="post-meta">
+								<time datetime={post.data.pubDate.toISOString()}>{dateFormat.format(post.data.pubDate)}</time>
+								<span class="meta-separator" aria-hidden="true">·</span>
+								<span>{readTime(post.body)} min read</span>
+							</div>
+							<div class="post-title-row">
+								<h2>{post.data.title}</h2>
+								<span class="arrow" aria-hidden="true">↗</span>
+							</div>
+							<p class="post-description">{post.data.description}</p>
+							<div class="tag-list" aria-label="Topics">
+								{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+							</div>
+						</a>
+					</article>
+				))}
+			</div>
+		) : (
+			<div class="empty-archive">
+				<p>No published articles yet.</p>
+				<span>New writing will appear here when it is ready.</span>
+			</div>
+		)}
+
+		{page.lastPage > 1 && (
+			<nav class="pagination" aria-label="Archive pages">
+				{page.url.prev ? <a class="pagination-button" href={`${base}${page.url.prev.replace(/^\//, '')}`}><span aria-hidden="true">←</span> Newer</a> : <span class="pagination-spacer"></span>}
+				<span class="pagination-status">Page {page.currentPage} <span>of</span> {page.lastPage}</span>
+				{page.url.next ? <a class="pagination-button" href={`${base}${page.url.next.replace(/^\//, '')}`}>Older <span aria-hidden="true">→</span></a> : <span class="pagination-spacer"></span>}
+			</nav>
+		)}
+	</main>
+</SiteLayout>
