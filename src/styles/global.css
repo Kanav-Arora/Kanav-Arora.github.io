@@ -46,8 +46,7 @@ button, select { color: inherit; }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
 .brand-mark, .about-mark, .endnote-mark { display: grid; place-items: center; flex: 0 0 auto; color: #f7f7f5; background: #373a42; font-family: 'Manrope', sans-serif; font-weight: 800; }
 .brand-mark { width: 31px; height: 31px; border-radius: 9px; font-size: 15px; letter-spacing: -.08em; }
-.brand-mark { display: flex; align-items: center; justify-content: center; }
-.brand-mark span { color: #c9d0dc; }
+.brand-mark { display: block; object-fit: cover; }
 .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -.02em; }
 .main-nav { display: flex; align-items: center; gap: 30px; margin-left: auto; }
 .main-nav a, .footer-inner p { color: var(--muted); font-size: 13px; text-decoration: none; }
